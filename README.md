@@ -8,7 +8,7 @@
 
 ## Introduction
 
-XVERSE Character UE plugin (XVCharacter UE Plugin) a 3D digital human creation plugin for Unreal Engine 5, developed by XVERSE Technology Inc. (Zhenshen, China). Currently, the main capability of this plugin is to provide a convenient way to acquire assets for text-generated animations. In traditional animation generation pipelines, users typically acquire animation assets by hand crafting or use motion capture devices, then import them into UE projects for editing and adjustment. Thanks to the development of generative AI tachnology, we can now use XVerse AI inference service based on physics simulation to directly obtain the desired animation asset files within the UE project by describing them in text, helping developers quickly obtain animation assets to preview effects during project iterations.
+XVERSE Character UE plugin (XCharacter UE Plugin) a 3D digital human creation plugin for Unreal Engine 5, developed by XVERSE Technology Inc. (Zhenshen, China). Currently, the main capability of this plugin is to provide a convenient way to acquire assets for text-generated animations. In traditional animation generation pipelines, users typically acquire animation assets by hand crafting or use motion capture devices, then import them into UE projects for editing and adjustment. Thanks to the development of generative AI tachnology, we can now use XVerse AI inference service based on physics simulation to directly obtain the desired animation asset files within the UE project by describing them in text, helping developers quickly obtain animation assets to preview effects during project iterations.
 
 It is important to note that the plugin itself does not consume local computing resources, but rather accesses XVerse MotionGen service over Internet to obtain assets. 
 
@@ -68,7 +68,7 @@ If you have any questions during the application process or would like to know m
 
 1. Visit GitHub [XCharacter-UEPlugin](https://github.com/xverse-engine/XCharacter-UEPlugin)
 2. Download the Release plugin version corresponding to the UE version you are using
-3. Extract and move the `XVCharacter` folder to the `Plugins` folder in your UE project
+3. Extract and move the `XCharacter` folder to the `Plugins` folder in your UE project
 
 ### Configuring Access Key
 
