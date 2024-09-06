@@ -202,7 +202,7 @@ MotionGen支持像指导真人演员那样使用文本描述的方式进行。�
 投递时请邮件标题标明申请正式员工or实习生岗位
 
 
-### 发布说明
+## 发布说明
 
 [v1.0.0-alpha](https://github.com/xverse-engine/XCharacter-UEPlugin/releases/tag/V1.0.0-alpha)
 
@@ -210,7 +210,7 @@ MotionGen支持像指导真人演员那样使用文本描述的方式进行。�
    - 添加 Text2Motion 面板
    - 添加默认骨架重定向资产
 
-### 贡献者
+## 贡献者
 
 <a href="https://github.com/xverse-engine/XCharacter-UEPlugin/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=xverse-engine/XCharacter-UEPlugin" />
