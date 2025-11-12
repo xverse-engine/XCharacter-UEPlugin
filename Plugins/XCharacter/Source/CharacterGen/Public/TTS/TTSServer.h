@@ -39,6 +39,14 @@ struct FTTSSegmentResult
     // 是否已保存为资产
     UPROPERTY()
     bool bIsSavedAsAsset = false;
+
+    // 段前静音（秒）
+    UPROPERTY()
+    float PreSilence = 0.0f;
+
+    // 段后静音（秒）
+    UPROPERTY()
+    float PostSilence = 0.0f;
 };
 
 // TTS请求参数结构体
@@ -89,6 +97,12 @@ struct FTTSRequestParams
     TArray<UTTSSetting*>* AllTempSettings = nullptr;
     UTTSSetting* OriginalTTSSettings = nullptr;
 
+    // 静音信息（段前静音和段后静音，单位：秒）
+    float PreSilence = 0.0f;
+    float PostSilence = 0.0f;
+
+    // 重试计数（用于429错误重试）
+    int32 RetryCount = 0;
 
     FTTSRequestParams() = default;
 
@@ -130,7 +144,9 @@ struct FTTSRequestParams
                      int32* InBatchSize,
                      TArray<FString>* InAllTextSegments,
                      TArray<UTTSSetting*>* InAllTempSettings,
-                     UTTSSetting* InOriginalTTSSettings)
+                     UTTSSetting* InOriginalTTSSettings,
+                     float InPreSilence = 0.0f,
+                     float InPostSilence = 0.0f)
         : LocalSettings(InLocalSettings)
         , Settings(InSettings)
         , SegmentIndex(InSegmentIndex)
@@ -146,6 +162,8 @@ struct FTTSRequestParams
         , AllTextSegments(InAllTextSegments)
         , AllTempSettings(InAllTempSettings)
         , OriginalTTSSettings(InOriginalTTSSettings)
+        , PreSilence(InPreSilence)
+        , PostSilence(InPostSilence)
     {
     }
 };
@@ -181,6 +199,9 @@ public:
                                  int32 ReplicatesPerSegment);
     // 获取已缓存的说话人显示字符串（若未加载则返回空）
     static TArray<FString> GetCachedSpeakerOptions();
+    
+    // 验证豆包TTS API配置参数
+    static bool ValidateDoubaoTTSConfig(const UXVCPluginSettings* Settings, const FString& Context = TEXT(""));
 
     // 全部TTS完成事件（仅编辑器使用）
     DECLARE_MULTICAST_DELEGATE_TwoParams(FTTSAllCompleted, const TArray<FTTSSegmentResult>&, UTTSSetting*);

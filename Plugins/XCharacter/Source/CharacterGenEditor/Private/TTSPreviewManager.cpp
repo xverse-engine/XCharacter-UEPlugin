@@ -193,15 +193,13 @@ void UTTSPreviewManager::ShowTTSPreviewWindow(const TArray<FTTSSegmentResult>& R
     // 优先使用传入的TTS设置对象，如果没有则使用默认对象
     UTTSSetting* TTSSettingsToUse = CurrentTTSSettings ? CurrentTTSSettings : UTTSSetting::Get();
     FString CurrentSpeakerName = TTSSettingsToUse ? TTSSettingsToUse->SpeakerName : TEXT("");
-    FString CurrentEmotionName = TTSSettingsToUse ? TTSSettingsToUse->EmotionName : TEXT("自适应");
     float CurrentSpeed = TTSSettingsToUse ? TTSSettingsToUse->AudioSpeed : 1.0f;
     float CurrentPitch = TTSSettingsToUse ? TTSSettingsToUse->AudioPitch : 1.0f;
     
     // TTS预览界面初始化
     
-    // 检查音色和情感选项列表
+    // 检查音色选项列表
     TArray<FString> SpeakerOptions = UTTSSetting::GetSpeakerOptions();
-    TArray<FString> EmotionOptions = UTTSSetting::GetEmotionOptions();
     
     // 如果音色为空，尝试从音色选项中获取第一个作为默认值
     if (CurrentSpeakerName.IsEmpty())
@@ -241,12 +239,6 @@ void UTTSPreviewManager::ShowTTSPreviewWindow(const TArray<FTTSSegmentResult>& R
         if (!SegmentSpeakerSelections.Contains(SegIdx))
         {
             SegmentSpeakerSelections.Add(SegIdx, MakeShared<FString>(CurrentSpeakerName));
-        }
-        // 重新合成模式下保持原有配置，不强制更新
-        
-        if (!SegmentEmotionSelections.Contains(SegIdx))
-        {
-            SegmentEmotionSelections.Add(SegIdx, MakeShared<FString>(CurrentEmotionName));
         }
         // 重新合成模式下保持原有配置，不强制更新
         
@@ -303,20 +295,6 @@ void UTTSPreviewManager::ShowTTSPreviewWindow(const TArray<FTTSSegmentResult>& R
             return &SpeakerOptions;
         };
         
-        auto GetEmotionOptions = []() -> const TArray<TSharedPtr<FString>>*
-        {
-            static TArray<TSharedPtr<FString>> EmotionOptions;
-            
-            // 每次都重新获取最新的情感列表
-            EmotionOptions.Empty();
-            TArray<FString> RawEmotionOptions = UTTSSetting::GetEmotionOptions();
-            for (const FString& Option : RawEmotionOptions)
-            {
-                EmotionOptions.Add(MakeShared<FString>(Option));
-            }
-            
-            return &EmotionOptions;
-        };
 
 
 
@@ -338,54 +316,6 @@ void UTTSPreviewManager::ShowTTSPreviewWindow(const TArray<FTTSSegmentResult>& R
                 + SVerticalBox::Slot().AutoHeight()
                 [
                     SNew(SHorizontalBox)
-                    // 情感
-                    + SHorizontalBox::Slot().FillWidth(1.f).Padding(0,0,8.f,0)
-                    [
-                        SNew(SVerticalBox)
-                        + SVerticalBox::Slot().AutoHeight().Padding(0,0,0,4)
-                    [
-                        SNew(STextBlock)
-                        .Text(FText::FromString(TEXT("情感:")))
-                        .Font(FCoreStyle::GetDefaultFontStyle("Normal", 9))
-                    ]
-                        + SVerticalBox::Slot().AutoHeight()
-                    [
-                        SNew(SComboBox<TSharedPtr<FString>>)
-                            .OptionsSource(GetEmotionOptions())
-                            .OnGenerateWidget_Lambda([](TSharedPtr<FString> Item) -> TSharedRef<SWidget>
-                            {
-                                return SNew(STextBlock).Text(FText::FromString(*Item));
-                            })
-                            .OnSelectionChanged_Lambda([this, SegIdx](TSharedPtr<FString> NewSelection, ESelectInfo::Type SelectInfo)
-                            {
-                                if (NewSelection.IsValid())
-                                {
-                                    if (!SegmentEmotionSelections.Contains(SegIdx))
-                                    {
-                                        SegmentEmotionSelections.Add(SegIdx, MakeShared<FString>());
-                                    }
-                                    *SegmentEmotionSelections[SegIdx] = *NewSelection;
-                                }
-                            })
-                        .Content()
-                        [
-                            SNew(STextBlock)
-                                .Text_Lambda([this, SegIdx]() -> FText
-                            {
-                                    // 检查SegmentEmotionSelections是否包含当前段落
-                                if (SegmentEmotionSelections.Contains(SegIdx))
-                                {
-                                        FString SelectedValue = *(*SegmentEmotionSelections.Find(SegIdx));
-                                        if (!SelectedValue.IsEmpty())
-                                        {
-                                            return FText::FromString(SelectedValue);
-                                        }
-                                    }
-                                    return FText::FromString(TEXT("选择情感"));
-                                })
-                            ]
-                        ]
-                    ]
                     // 语速
                     + SHorizontalBox::Slot().FillWidth(1.f).Padding(0,0,8.f,0)
                     [
@@ -846,17 +776,12 @@ void UTTSPreviewManager::ShowTTSPreviewWindow(const TArray<FTTSSegmentResult>& R
                 {
                     // 获取当前段落的配置
                     FString SpeakerName = TEXT("");
-                    FString EmotionName = TEXT("");
                     float Speed = 1.0f;
                     float Pitch = 1.0f;
                     
                     if (const TSharedPtr<FString>* Found = SegmentSpeakerSelections.Find(SegIdx))
                     {
                         SpeakerName = **Found;
-                    }
-                    if (const TSharedPtr<FString>* Found = SegmentEmotionSelections.Find(SegIdx))
-                    {
-                        EmotionName = **Found;
                     }
                     if (const float* Found = SegmentSpeedValues.Find(SegIdx))
                     {
@@ -871,7 +796,7 @@ void UTTSPreviewManager::ShowTTSPreviewWindow(const TArray<FTTSSegmentResult>& R
                 RegeneratingSegments.Add(SegIdx, true);
                 
                     // 调用重新合成功能
-                    RegenerateTTSForSegment(SegIdx, *BoundText, SpeakerName, EmotionName, Speed, Pitch);
+                    RegenerateTTSForSegment(SegIdx, *BoundText, SpeakerName, TEXT(""), Speed, Pitch);
                         return FReply::Handled();
                     })
                 ]
@@ -2095,7 +2020,6 @@ void UTTSPreviewManager::RegenerateTTSForSegment(int32 SegmentIndex, const FStri
     
     // 应用新的设置
     TempSettings->SpeakerName = SpeakerName;
-    TempSettings->EmotionName = EmotionName;
     TempSettings->AudioSpeed = Speed;
     TempSettings->AudioPitch = Pitch;
     
@@ -2241,14 +2165,13 @@ void UTTSPreviewManager::OnEnhanceAudioCompleted(bool bSuccess, const FString& O
 void UTTSPreviewManager::SavePreviewWindowState()
 {
     // 保存预览窗口的所有状态
-    // 注意：EditedTextBySegment, SegmentSpeakerSelections, SegmentEmotionSelections, 
+    // 注意：EditedTextBySegment, SegmentSpeakerSelections, 
     // SegmentSpeedValues, SegmentPitchValues, SelectedReplicateBySegment 等状态
     // 已经在类的成员变量中保存，不需要额外保存
     
     UE_LOG(LogTemp, Log, TEXT("保存预览窗口状态完成"));
     UE_LOG(LogTemp, Log, TEXT("已保存 %d 个段落的文本编辑状态"), EditedTextBySegment.Num());
     UE_LOG(LogTemp, Log, TEXT("已保存 %d 个段落的音色选择状态"), SegmentSpeakerSelections.Num());
-    UE_LOG(LogTemp, Log, TEXT("已保存 %d 个段落的情感选择状态"), SegmentEmotionSelections.Num());
     UE_LOG(LogTemp, Log, TEXT("已保存 %d 个段落的音频选择状态"), SelectedReplicateBySegment.Num());
 }
 
@@ -2312,7 +2235,6 @@ void UTTSPreviewManager::RestorePreviewWindowState()
     UE_LOG(LogTemp, Log, TEXT("恢复预览窗口状态完成"));
     UE_LOG(LogTemp, Log, TEXT("已恢复 %d 个段落的文本编辑状态"), EditedTextBySegment.Num());
     UE_LOG(LogTemp, Log, TEXT("已恢复 %d 个段落的音色选择状态"), SegmentSpeakerSelections.Num());
-    UE_LOG(LogTemp, Log, TEXT("已恢复 %d 个段落的情感选择状态"), SegmentEmotionSelections.Num());
     UE_LOG(LogTemp, Log, TEXT("已恢复 %d 个段落的音频选择状态"), SelectedReplicateBySegment.Num());
     
     // 重新计算选中音频的总时长
@@ -2327,7 +2249,6 @@ void UTTSPreviewManager::ClearAllTTSPreviewState()
     SelectedReplicateBySegment.Empty();
     EditedTextBySegment.Empty();
     SegmentSpeakerSelections.Empty();
-    SegmentEmotionSelections.Empty();
     SegmentSpeedValues.Empty();
     SegmentPitchValues.Empty();
     SegmentPreSilenceValues.Empty();
@@ -2541,17 +2462,8 @@ void UTTSPreviewManager::RetryFailedTTS(const TArray<FString>& OriginalTexts, UT
         // 创建临时的TTS设置对象
         UTTSSetting* TempSettings = NewObject<UTTSSetting>(GetTransientPackage());
         TempSettings->SpeakerName = TTSSettings->SpeakerName;
-        TempSettings->EmotionName = TTSSettings->EmotionName;
         TempSettings->AudioSpeed = TTSSettings->AudioSpeed;
         TempSettings->AudioPitch = TTSSettings->AudioPitch;
-        TempSettings->VoiceAudio = TTSSettings->VoiceAudio;
-        TempSettings->EmotionAudio = TTSSettings->EmotionAudio;
-        TempSettings->VoiceAudioFileName = TTSSettings->VoiceAudioFileName;
-        TempSettings->CustomEmotionName = TTSSettings->CustomEmotionName;
-        TempSettings->VoiceAudioBytes = TTSSettings->VoiceAudioBytes;
-        TempSettings->EmotionAudioBytes = TTSSettings->EmotionAudioBytes;
-        TempSettings->bUseCustomVoiceAudio = TTSSettings->bUseCustomVoiceAudio;
-        TempSettings->bUseCustomEmotionAudio = TTSSettings->bUseCustomEmotionAudio;
         TempSettings->TTSInputText = TextToRetry;
         
         // 重试该段落的所有复本（因为该段落完全没有有效音频）

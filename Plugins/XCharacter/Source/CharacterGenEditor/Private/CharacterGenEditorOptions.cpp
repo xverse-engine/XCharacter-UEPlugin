@@ -47,9 +47,7 @@
 // 析构函数实现
 SCharacterGenEditorOptions::~SCharacterGenEditorOptions()
 {
-    // 清除所有缓存的音色和情感数据
-    UTTSSetting::ClearAllCachedData();
-    UE_LOG(LogTemp, Log, TEXT("SCharacterGenEditorOptions析构函数被调用，已清除所有缓存数据"));
+    UE_LOG(LogTemp, Log, TEXT("SCharacterGenEditorOptions析构函数被调用"));
 }
 
 
@@ -115,32 +113,10 @@ void SCharacterGenEditorOptions::Construct(const FArguments& InArgs)
         if (Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, TTSInputText) ||
             Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, SpeakerName) ||
             Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, AudioSpeed) ||
-            Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, AudioPitch) ||
-            Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, EmotionName))
+            Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, AudioPitch))
         {
             // TTS相关属性变更时刷新视图
             // 移除ForceRefresh以避免循环刷新
-        }
-        else if (Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, VoiceAudio))
-        {
-            // 音色音频选择改变
-            if (TTSSettings)
-            {
-                TTSSettings->ProcessVoiceAudioSelection();
-                // 刷新音色列表
-                if (TTSSettingDetailsView.IsValid())
-                {
-                    TTSSettingDetailsView->ForceRefresh();
-                }
-            }
-        }
-        else if (Event.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UTTSSetting, EmotionAudio))
-        {
-            // 情感音频选择改变
-            if (TTSSettings)
-            {
-                TTSSettings->ProcessEmotionAudioSelection();
-            }
         }
     });
     

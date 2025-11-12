@@ -115,7 +115,6 @@ private:
     TMap<int32, int32> SelectedReplicateBySegment;        // 每个段选择的复本索引
     TMap<int32, TSharedPtr<FString>> EditedTextBySegment; // 每段可编辑的文本内容
     TMap<int32, TSharedPtr<FString>> SegmentSpeakerSelections; // 每个段落的音色选择
-    TMap<int32, TSharedPtr<FString>> SegmentEmotionSelections; // 每个段落的情感选择
     TMap<int32, float> SegmentSpeedValues;                // 每个段落的语速值
     TMap<int32, float> SegmentPitchValues;                // 每个段落的音高值
     TMap<int32, float> SegmentPreSilenceValues;           // 每个段落的段前静音

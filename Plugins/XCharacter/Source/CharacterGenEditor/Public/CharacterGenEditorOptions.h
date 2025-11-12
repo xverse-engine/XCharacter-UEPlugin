@@ -148,31 +148,55 @@ public:
 					return FReply::Handled();
 				}
 				
-				// 验证音色选择
-				if (TTSSettings->SpeakerName.IsEmpty())
-				{
-					FNotificationInfo Info(FText::FromString(TEXT("请先选择音色！")));
-					Info.bUseLargeFont = true;
-					Info.ExpireDuration = 3.0f;
-					FSlateNotificationManager::Get().AddNotification(Info)->SetCompletionState(SNotificationItem::CS_Fail);
-					return FReply::Handled();
-				}
-				
-				// 设置按钮为合成中状态
-				bIsTTSGenerating = true;
-				TTSProgressValue = 0.0f;
-				
-				// 初始化真实进度跟踪
-				TTSCompletedCount = 0;
-				TTSTotalCount = 0;
-				bUseRealProgress = false;
-				
-				// 启动进度条更新定时器
-				StartTTSProgressTimer();
-				
-				// 保存当前窗口引用，以便在TTS完成后恢复焦点
-				CurrentTTSWindow = WidgetWindow;
-				TTSSettings->SynthesizeTTSAudio();
+			// 验证音色选择
+			if (TTSSettings->SpeakerName.IsEmpty())
+			{
+				FNotificationInfo Info(FText::FromString(TEXT("请先选择音色！")));
+				Info.bUseLargeFont = true;
+				Info.ExpireDuration = 3.0f;
+				FSlateNotificationManager::Get().AddNotification(Info)->SetCompletionState(SNotificationItem::CS_Fail);
+				return FReply::Handled();
+			}
+			
+			// 在设置状态前先验证豆包TTS API配置参数
+			const UXVCPluginSettings* Settings = GetDefault<UXVCPluginSettings>();
+			if (!UTTSServer::ValidateDoubaoTTSConfig(Settings, TEXT("OnGenerateTTS")))
+			{
+				// 验证失败，不设置状态，直接返回
+				return FReply::Handled();
+			}
+			
+			// 设置按钮为合成中状态
+			bIsTTSGenerating = true;
+			TTSProgressValue = 0.0f;
+			
+			// 初始化真实进度跟踪
+			TTSCompletedCount = 0;
+			TTSTotalCount = 0;
+			bUseRealProgress = false;
+			
+		// 启动进度条更新定时器
+		StartTTSProgressTimer();
+		
+		// 在调用TTS合成前，强制刷新属性视图以确保所有属性值已同步
+		if (TTSSettingDetailsView.IsValid())
+		{
+			TTSSettingDetailsView->ForceRefresh();
+			UE_LOG(LogTemp, Log, TEXT("OnGenerateTTS: 强制刷新属性视图，当前语速=%.2f, 语调=%.2f"), 
+				TTSSettings->AudioSpeed, TTSSettings->AudioPitch);
+		}
+		
+		// 保存当前窗口引用，以便在TTS完成后恢复焦点
+		CurrentTTSWindow = WidgetWindow;
+		
+		// 调用TTS合成（如果失败，需要重置状态）
+		bool bSuccess = TTSSettings->SynthesizeTTSAudio();
+		if (!bSuccess)
+		{
+			// 如果合成失败，重置状态
+			bIsTTSGenerating = false;
+			StopTTSProgress();
+		}
 			}
 		}
 		

@@ -93,6 +93,25 @@ public:
 	const FString API_GetSpeakerList = "api/get_spkr_config";
 	const FString API_EnhanceAudio = "api/enhance_audio";
 	
+	// 豆包TTS服务器配置
+	UPROPERTY(Config, EditAnywhere, Category = Settings, Meta = (DisplayName = "豆包TTS服务器URL"))
+	FString IP_DoubaoTTS_Server{ "https://openspeech.bytedance.com" };
+	
+	UPROPERTY(Config, EditAnywhere, Category = Settings, Meta = (DisplayName = "豆包AppID"))
+	FString DoubaoTTS_AppID{ "" };
+	
+	UPROPERTY(Config, EditAnywhere, Category = Settings, Meta = (DisplayName = "豆包Access Token", Sensitive = true))
+	FString DoubaoTTS_AccessToken{ "" };
+	
+	UPROPERTY(Config, EditAnywhere, Category = Settings, Meta = (DisplayName = "豆包Cluster"))
+	FString DoubaoTTS_Cluster{ "" };
+	
+	UPROPERTY(Config, EditAnywhere, Category = Settings, Meta = (DisplayName = "豆包User ID"))
+	FString DoubaoTTS_UserID{ "" };
+	
+	// 豆包TTS API端点（常量，不需要配置）
+	const FString API_DoubaoTTS = "/api/v1/tts";
+	
 	// A2F服务器配置
 	const FString API_Audio2Face = "api/infer";
 	
