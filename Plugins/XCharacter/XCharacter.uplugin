@@ -1,27 +1,95 @@
 {
-	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "XCharacter",
-	"Description": "",
-	"Category": "Other",
-	"CreatedBy": "XVerse",
-	"CreatedByURL": "",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"SupportURL": "",
-	"EngineVersion": "5.2.0",
-	"CanContainContent": true,
-	"Installed": true,
-	"Modules": [
-		{
-			"Name": "MotionGen",
-			"Type": "Editor",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"IKRig",
-				"IKRigEditor"
-			]
-		}
-	]
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "XCharacter",
+  "Description": "",
+  "Category": "Other",
+  "CreatedBy": "XVerse",
+  "CreatedByURL": "",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "CharacterGen",
+      "Type": "Editor",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [
+        "Protocol"
+      ]
+    },
+    {
+      "Name": "CharacterGenEditor",
+      "Type": "Editor",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [
+        "CharacterGen",
+        "Protocol"
+      ]
+    },
+    {
+      "Name": "Protocol",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "XSequencer",
+      "Type": "Editor",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [
+        "Protocol"
+      ]
+    },
+    {
+      "Name": "RuntimeAudioImporter",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
+      "Name": "EasyFileDialog",
+      "Type": "Runtime",
+      "LoadingPhase": "PreLoadingScreen",
+      "PlatformAllowList": [
+        "Win64"
+      ]
+    },
+    {
+      "Name": "EasyCsv",
+      "Type": "Runtime",
+      "LoadingPhase": "Default",
+      "PlatformAllowList": [
+        "Win64",
+        "Android",
+        "Mac",
+        "IOS",
+        "TVOS",
+        "Linux"
+      ]
+    },
+    {
+      "Name": "CharAssetProcessor",
+      "Type": "Editor",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [
+        "PythonScriptPlugin",
+        "EditorScriptingUtilities"
+      ]
+    },
+    {
+      "Name": "CharacterRuntime",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "AndroidPermission",
+      "Enabled": true
+    }
+  ]
 }
